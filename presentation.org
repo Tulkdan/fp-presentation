@@ -1,0 +1,201 @@
+#+TITLE: Functional Programming
+#+AUTHOR: Pedro Correa
+
+* Functional Programming
+
+#+ATTR_HTML: :width 400px
+[[file:imgs/functional.jpg]]
+
+* Functional Programming
+** What it is
+
+- Programming paradigm
+- It's a way to think about structural code
+- Tech savvy dialect
+
+** Little bit of history
+
+- Invented by some mathematicians in the 60's
+- First programming language was Lisp
+- One of the first languages to have garbage collector
+
+** Changing of paradigms of programming languages
+
+- With ES6, JS have introduced a lot of functional programming conceps to it
+  - ~.map~
+  - ~.reduce~
+  - ~.filter~
+- React :: influencing a whole new field of libraries and developers to be functional
+- Some programming languages started adopting some methods to be multi-paradigm
+  - Java
+  - .NET
+  - Rust
+  - Kotlin
+
+* Concepts of functional programming
+
+** Everything is a function
+
+- No classes, only functions
+- Why? Easier to extend and easier to fix :: small functions, small contexts, small responsabilities
+- Everything should should receive a data and return a data :: input -> output
+
+** Declarative code
+
+What's de diference between these methods in JS?
+- =every()=
+- =filter()=
+- =flatMap()=
+- =map()=
+- =indexOf()=
+- =reduce()=
+- =reduceRigth()=
+- =reverse()=
+- =slice()=
+- =some()=
+- =splice()=
+
+We could implement all these methods with a =for= loop or the =forEach()= method,
+they all seem so redundant...
+
+*** Examples
+
+**** Imperative
+#+begin_src js
+  const dataModified = [
+      { name: 'bar', value: 100 },
+      { name: 'bar', value: 101 }
+  ]
+
+  for (const item of dataModified) {
+      item.id = `${item.name}-${item.value}`
+  }
+
+  console.log(dataModified)
+#+end_src
+
+**** Functional
+
+#+begin_src js
+  const dataModified = [
+      { name: 'bar', value: 100 },
+      { name: 'bar', value: 101 }
+  ]
+
+  const result = dataModified
+      .map(item => ({ ...item, id: `${item.name}-${item.value}` }))
+
+  console.log(result)
+#+end_src
+
+** Imutability
+
+** Lazy loading
+
+** Recursion
+
+See Sergio's presentation about it
+
+- Functional programming languages doesn't loops :: for, while, do while
+- They iterate using recursion
+- That's way their garbage collector is totally diferent from JS and that's why it needs to be lazy loaded 
+
+*** Example
+
+#+begin_src js
+  function factorial(number) {
+      if (number === 0) return 1
+      return number * factorial(number - 1)
+  }
+
+  console.log(factorial(3))
+#+end_src
+
+** Pure functions
+
+- Functions shouldn't have any reference outside of it's scope
+
+*** Example
+
+**** Impure
+#+begin_src js
+  const allowed = [123, 456, 789]
+
+  function isAllowed(id) {
+      return allowed.includes(id)
+  }
+
+  console.log(isAllowed(321))
+#+end_src
+
+**** Pure
+#+begin_src js
+  function isAllowed(allowed, id) {
+      return allowed.includes(id)
+  }
+
+  console.log(isAllowed([123, 456, 789], 321))
+#+end_src
+
+** High-order functions
+
+See Vandre's presentation about closure
+
+- Function that return a function to be executed later on
+
+*** Example
+#+begin_src js
+  const kingGizzard = {
+      name: 'King Gizzard and the Lizard Wizard',
+      genres: [
+          'garage rock',
+          'rock',
+          'psychedelic rock',
+          'jazz fusion',
+          'heavy psychedelic rock',
+          'progressive rock',
+          'syth pop',
+          'thrash metal'
+      ]
+  }
+
+  function validateBandGenre(band) {
+      return function(genre) {
+          return band.genres.includes(genre)
+      }
+  }
+
+  // or using arrow function ===> const validateBandGenre = band => genre => band.genres.includes(genre)
+
+  const validateKingGizzardGenres = validateBandGenre(kingGizzard)
+
+  console.log(validateKingGizzardGenres('rock'))
+  console.log(validateKingGizzardGenres('pop'))
+#+end_src
+
+* Function composition
+
+- Function that compose based on another function to create a new behavior
+- There's a lot of utility libraries for JS:
+  - [[https://github.com/lodash/lodash/wiki/FP-Guide][Lodash FP module]] :: doesn't have a lot of utilities
+  - [[https://ramdajs.com/][Ramda JS]] :: has tons of functions and is focused in functional programming
+
+** Compose
+
+** Pipe
+
+** Curry
+
+* Downsides
+
+** Memory consumption
+
+** Type system can become complex over time
+
+** Harder to onboard
+
+* References
+
+- [[https://www.youtube.com/watch?v=e-5obm1G_FY][Learning Functional Programming with Javascript - Anjana Vakil]]
+
+- [[https://github.com/raonifn/ramda-presentation][Ramda presentation - Raoni Normanton]]
