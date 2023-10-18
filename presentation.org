@@ -31,6 +31,7 @@
   - .NET
   - Rust
   - Kotlin
+  - Swift
 
 * Concepts of functional programming
 
@@ -38,7 +39,7 @@
 
 - No classes, only functions
 - Why? Easier to extend and easier to fix :: small functions, small contexts, small responsabilities
-- Everything should should receive a data and return a data :: input -> output
+- Everything should receive a data and return a data :: input -> output
 
 ** Declarative code
 
@@ -82,8 +83,10 @@ they all seem so redundant...
       { name: 'bar', value: 101 }
   ]
 
-  const result = dataModified
-      .map(item => ({ ...item, id: `${item.name}-${item.value}` }))
+  const result = dataModified.map(item => ({
+      ...item,
+      id: `${item.name}-${item.value}`
+  }))
 
   console.log(result)
 #+end_src
@@ -96,7 +99,7 @@ they all seem so redundant...
 
 See Sergio's presentation about it
 
-- Functional programming languages doesn't loops :: for, while, do while
+- Functional programming languages doesn't have loops :: for, while, do while
 - They iterate using recursion
 - That's way their garbage collector is totally diferent from JS and that's why it needs to be lazy loaded 
 
@@ -114,8 +117,9 @@ See Sergio's presentation about it
 ** Pure functions
 
 - Functions shouldn't have any reference outside of it's scope
+- The function should always have the same output for the same input
 
-*** Example
+*** Examples
 
 **** Impure
 #+begin_src js
@@ -126,6 +130,10 @@ See Sergio's presentation about it
   }
 
   console.log(isAllowed(321))
+
+  allowed.push(321)
+
+  console.log(isAllowed(321))
 #+end_src
 
 **** Pure
@@ -134,7 +142,12 @@ See Sergio's presentation about it
       return allowed.includes(id)
   }
 
-  console.log(isAllowed([123, 456, 789], 321))
+  console.log(
+      isAllowed([123, 456, 789], 321)
+  )
+  console.log(
+      isAllowed([123, 456, 789, 321], 321)
+  )
 #+end_src
 
 ** High-order functions
@@ -144,6 +157,7 @@ See Vandre's presentation about closure
 - Function that return a function to be executed later on
 
 *** Example
+#+NAME: best-band-example
 #+begin_src js
   const kingGizzard = {
       name: 'King Gizzard and the Lizard Wizard',
@@ -158,7 +172,10 @@ See Vandre's presentation about closure
           'thrash metal'
       ]
   }
+#+end_src
 
+#+begin_src js :noweb yes
+  <<best-band-example>>
   function validateBandGenre(band) {
       return function(genre) {
           return band.genres.includes(genre)
@@ -169,8 +186,12 @@ See Vandre's presentation about closure
 
   const validateKingGizzardGenres = validateBandGenre(kingGizzard)
 
-  console.log(validateKingGizzardGenres('rock'))
-  console.log(validateKingGizzardGenres('pop'))
+  console.log(
+      validateKingGizzardGenres('rock')
+  )
+  console.log(
+      validateKingGizzardGenres('pop')
+  )
 #+end_src
 
 * Function composition
@@ -180,11 +201,152 @@ See Vandre's presentation about closure
   - [[https://github.com/lodash/lodash/wiki/FP-Guide][Lodash FP module]] :: doesn't have a lot of utilities
   - [[https://ramdajs.com/][Ramda JS]] :: has tons of functions and is focused in functional programming
 
-** Compose
-
 ** Pipe
 
+- Combine functions to be executed in order
+- The output of one function is the input to the next until there's all functions are executed
+- High-order function that returns a function that has the initial param to be of the first function and returns the output of the last function
+
+#+NAME: pipe-example
+#+begin_src js
+  function pipe(...fns) {
+      return function(value) {
+          return fns.reduce((acc, fn) => fn(acc), value)
+      }
+  }
+#+end_src
+  
+*** Example 
+
+#+begin_src js
+  const classyGreeting = ({ firstName, lastName }) => `The name's ${lastName}, ${firstName} ${lastName}`
+
+  const toUpper = name => name.toUpperCase() 
+
+  const greet = classyGreeting({ firstName: 'James', lastName: 'Bond' })
+  console.log(
+      toUpper(greet)
+  )
+
+
+  console.log(
+      toUpper(
+          classyGreeting({ firstName: 'James', lastName: 'Bond' })
+      )
+  )
+#+end_src
+
+*** With pipe
+
+  #+begin_src js :noweb yes
+    <<pipe-example>>
+
+    const classyGreeting = ({ firstName, lastName }) => `The name's ${lastName}, ${firstName} ${lastName}`
+
+    const toUpper = name => name.toUpperCase() 
+
+    const yellGreeting = pipe(classyGreeting, toUpper)
+
+    console.log(
+        yellGreeting({ firstName: 'James', lastName: 'Bond' })
+    )
+  #+end_src
+
+** Compose
+
+- Same as =pipe=, but the order of execution is from right to left
+
+#+begin_src js :noweb yes
+  <<pipe-example>>
+
+  function compose(...fns) {
+      return pipe(...fns.reverse())
+  }
+
+  const classyGreeting = ({ firstName, lastName }) => `The name's ${lastName}, ${firstName} ${lastName}`
+
+  const toUpper = name => name.toUpperCase() 
+
+  const yellGreeting = compose(toUpper, classyGreeting)
+
+  console.log(
+      yellGreeting({ firstName: 'James', lastName: 'Bond' })
+  )
+#+end_src
+
 ** Curry
+
+- Makes that the function can be invoked with only some of the arguments
+- It is finally executed only when it receives all the arguments from the curried function
+
+  #+NAME: curry-example
+  #+begin_src js
+    function curry(fn, arity) {
+        arity ||= fn.length
+
+        return function(...args) {
+            if (args.length < arity) {
+                return curry(
+                    (...lefts) => fn(...args, ...lefts),
+                    arity - args.length
+                )
+            }
+
+            return fn(...args)
+        }
+    }
+  #+end_src
+  
+*** Example
+
+#+begin_src js :noweb yes
+  <<best-band-example>>
+
+  function validateBand(band, field, data) {
+      if (field === 'name') {
+          return band.name.includes(data)
+      }
+
+      if (field === 'genres') {
+          return band.genres.includes(data)
+      }
+  }
+
+  console.log(
+      validateBand(kingGizzard, 'genres', 'rock')
+  )
+  console.log(
+      validateBand(kingGizzard, 'genres', 'psychedelic rock')
+  )
+#+end_src
+
+*** Example with curry
+
+#+begin_src js :noweb yes
+  <<best-band-example>>
+  <<curry-example>>
+
+  function validateBand(band, field, data) {
+      if (field === 'name') {
+          return band.name.includes(data)
+      }
+
+      if (field === 'genres') {
+          return band.genres.includes(data)
+      }
+  }
+
+  const curriedValidateBand = curry(validateBand)
+
+  const validateKingGizzardGenres = curriedValidateBand(kingGizzard, 'genres')
+
+  console.log(
+      validateKingGizzardGenres('rock')
+  )
+  console.log(
+      validateKingGizzardGenres('psychedelic rock')
+  )
+#+end_src
 
 * Downsides
 
