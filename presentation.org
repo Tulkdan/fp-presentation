@@ -62,7 +62,7 @@ they all seem so redundant...
 *** Examples
 
 **** Imperative
-#+begin_src js
+#+begin_src js :tangle examples/3.2-declarative--imperative.js
   const dataModified = [
       { name: 'bar', value: 100 },
       { name: 'bar', value: 101 }
@@ -77,7 +77,7 @@ they all seem so redundant...
 
 **** Functional
 
-#+begin_src js
+#+begin_src js :tangle examples/3.2-declarative--functional.js
   const dataModified = [
       { name: 'bar', value: 100 },
       { name: 'bar', value: 101 }
@@ -101,7 +101,7 @@ they all seem so redundant...
 
 **** With side effects
 
-#+begin_src js
+#+begin_src js :tangle examples/3.3-immutability--side-effects.js
   const proPlayer = {
       name: 'Flash',
       game: 'Starcraft: Brood War',
@@ -138,7 +138,7 @@ they all seem so redundant...
 
 **** With Immutability
 
-#+begin_src js
+#+begin_src js :tangle examples/3.3-immutability--immutable.js
   const proPlayer = {
       name: 'Flash',
       game: 'Starcraft: Brood War',
@@ -180,10 +180,10 @@ they all seem so redundant...
 
 - It's a mechanism that delays the evaluation of an expression until its value is needed
 - With this, functional languages are able to create infinite lists, which would not normally be available in an imperative language
-
+  
 *** Examples
 
-#+begin_src js
+#+begin_src js :tangle examples/3.4-lazy-evaluation.js
   const rand = function * () {
       while (true) {
           yield Math.random()
@@ -206,7 +206,7 @@ See Sergio's presentation about it
 
 *** Example
 
-#+begin_src js
+#+begin_src js :tangle examples/3.5-recursion.js
   function factorial(number) {
       if (number === 0) return 1
       return number * factorial(number - 1)
@@ -233,7 +233,7 @@ See Sergio's presentation about it
   }
 #+end_src
 
-#+begin_src js :noweb yes
+#+begin_src js :noweb yes :tangle examples/3.6-pure-function--impure.js
   <<black-country>>
 
   function releaseRecord(recordName) {
@@ -256,7 +256,7 @@ See Sergio's presentation about it
 
 **** Pure
 
-#+begin_src js :noweb yes
+#+begin_src js :noweb yes :tangle examples/3.6-pure-function--pure.js
   <<black-country>>
 
   const releaseRecord = (band, recordName) => ({
@@ -303,7 +303,7 @@ See Vandre's presentation about closure
   }
 #+end_src
 
-#+begin_src js :noweb yes
+#+begin_src js :noweb yes :tangle examples/3.7-high-order-functions.js
   <<best-band-example>>
   function validateBandGenre(band) {
       return function(genre) {
@@ -349,7 +349,7 @@ See Vandre's presentation about closure
 
 **** Without pipe
 
-#+begin_src js :noweb yes
+#+begin_src js :noweb yes :tangle examples/4.1-function-composition--pipe--without-pipe.js
   <<black-country>>
 
   const releaseRecord = recordName => band => ({
@@ -374,7 +374,7 @@ See Vandre's presentation about closure
 
 **** With pipe
 
-  #+begin_src js :noweb yes
+  #+begin_src js :noweb yes :tangle examples/4.1-function-composition--pipe--with-pipe.js
     <<pipe-example>>
     <<black-country>>
 
@@ -399,7 +399,7 @@ See Vandre's presentation about closure
 
 - Same as =pipe=, but the order of execution is from right to left
 
-#+begin_src js :noweb yes
+#+begin_src js :noweb yes :tangle examples/4.2-function-composition--compose.js
   <<pipe-example>>
   <<black-country>>
 
@@ -452,7 +452,7 @@ See Vandre's presentation about closure
 
 **** Without curry
 
-#+begin_src js :noweb yes
+#+begin_src js :noweb yes :tangle examples/4.3-function-composition--curry--without-curry.js
   <<best-band-example>>
 
   function validateBand(band, field, data) {
@@ -473,9 +473,9 @@ See Vandre's presentation about closure
   )
 #+end_src
 
-**** Example with curry
+**** With curry
 
-#+begin_src js :noweb yes
+#+begin_src js :noweb yes :tangle examples/4.3-function-composition--curry--with-curry.js
   <<best-band-example>>
   <<curry-example>>
 
