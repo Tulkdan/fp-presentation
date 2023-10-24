@@ -26,7 +26,9 @@ function lostMatch(player) {
     })
 }
 
-Promise.all([
-    winRate(proPlayer),
-    lostMatch(proPlayer),
-])
+
+winRate(proPlayer)
+    .then(() => Promise.all([
+        winRate(proPlayer),
+        lostMatch(proPlayer),
+    ]))

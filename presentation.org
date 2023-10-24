@@ -28,7 +28,6 @@
 - React :: influencing a whole new field of libraries and developers to be functional
 - Some programming languages started adopting some methods to be multi-paradigm
   - Java
-  - .NET
   - Rust
   - Kotlin
   - Swift
@@ -130,10 +129,12 @@ they all seem so redundant...
       })
   }
 
-  Promise.all([
-      winRate(proPlayer),
-      lostMatch(proPlayer),
-  ])
+
+  winRate(proPlayer)
+      .then(() => Promise.all([
+          winRate(proPlayer),
+          lostMatch(proPlayer),
+      ]))
 #+end_src
 
 **** With Immutability
@@ -170,10 +171,11 @@ they all seem so redundant...
       })
   }
 
-  Promise.all([
-      winRate(proPlayer),
-      lostMatch(proPlayer),
-  ])
+  winRate(proPlayer)
+      .then(() => Promise.all([
+          winRate(proPlayer),
+          lostMatch(proPlayer),
+      ]))
 #+end_src
 
 ** Lazy evaluation
@@ -503,11 +505,9 @@ See Vandre's presentation about closure
 
 * Downsides
 
-** Memory consumption
-
-** Type system can become complex over time
-
-** Harder to onboard
+- Memory consumption
+- Type system can become complex over time
+- Harder to onboard
 
 * References
 

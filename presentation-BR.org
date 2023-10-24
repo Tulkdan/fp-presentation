@@ -504,11 +504,9 @@ Ver a apresentação do Vandre sobre /closures/
 
 * Pontos negativos
 
-** Consumo de memória
-
-** A tipagem do sistema pode ser tornar complexa com o tempo
-
-** Difícil de introduzir
+- Consumo de memória
+- A tipagem do sistema pode ser tornar complexa com o tempo
+- Difícil de introduzir
 
 * Referências
 
