@@ -1,0 +1,519 @@
+#+TITLE: Programação Funcional
+#+AUTHOR: Pedro Correa
+
+* Programação Funcional
+
+#+ATTR_HTML: :width 400px
+[[file:imgs/functional.jpg]]
+
+* Programação Funcional
+** O que é
+
+- Paradigma de programação
+- Modo de pensar na estrutura e organização do código
+- Jargão moda que o pessoal de TI usa
+
+** Um pouco de história
+
+- Criado nos anos 60 por matemáticos
+- Lisp foi umas das primeiras linguagens utilizando esse paradigma
+- Foi umas das primeiras linguagens com garbage collector
+
+** Alterando os paradigmas de linguagens de programação
+
+- Com ES6, JS introduziu muitos conceitos de programação funcional
+  - ~.map~
+  - ~.reduce~
+  - ~.filter~
+- React :: infuenciou todo o ecosistema de bibliotecas e desenvolvedores para serem mais funcionais
+- Algumas linguagens ja existentes começaram a adotar alguns métodos funcionais, transformando neles em linguagens multi-paradigmas
+  - Java
+  - Rust
+  - Kotlin
+  - Swift
+
+* Conceitos de programação funcional
+
+** Tudo é uma função
+
+- Sem classes, apenas funções
+- Por que? Facilidade de extender e realizar manutenção :: funções pequenas, contextos menores, poucas responsabilidades
+- Tudo deve ser pensado em receber algum dado e retornar dado :: input -> output
+
+** Código declarativo
+
+Qual a diferença entres esses métodos no JS?
+- =every()=
+- =filter()=
+- =flatMap()=
+- =map()=
+- =indexOf()=
+- =reduce()=
+- =reduceRigth()=
+- =reverse()=
+- =slice()=
+- =some()=
+- =splice()=
+
+A gente poderia implementar todos esses métodos com um =for= ou um =forEach()=,
+todos eles parecem redundante...
+
+*** Exemplos
+
+**** Imperativo
+#+begin_src js :tangle examples/3.2-declarative--imperative.js
+  const dataModified = [
+      { name: 'bar', value: 100 },
+      { name: 'bar', value: 101 }
+  ]
+
+  for (const item of dataModified) {
+      item.id = `${item.name}-${item.value}`
+  }
+
+  console.log(dataModified)
+#+end_src
+
+**** Funcional
+
+#+begin_src js :tangle examples/3.2-declarative--functional.js
+  const dataModified = [
+      { name: 'bar', value: 100 },
+      { name: 'bar', value: 101 }
+  ]
+
+  const result = dataModified.map(item => ({
+      ...item,
+      id: `${item.name}-${item.value}`
+  }))
+
+  console.log(result)
+#+end_src
+
+** Imutabilidade
+
+- Sempre tratar dados como imutáveis, uma vez criado, não pode ser alterado
+- Reduz risco de /side effects/
+- Facilita ao realizar paralelização do mesmo dado
+
+*** Exemplos
+
+**** Com /side effects/
+
+#+begin_src js :tangle examples/3.3-immutability--side-effects.js
+  const proPlayer = {
+      name: 'Flash',
+      game: 'Starcraft: Brood War',
+      race: 'Terran',
+      matches: { wins: 779, losses: 297 }
+  }
+
+  function winRate(player) {
+      return new Promise(resolve => {
+          setTimeout(() => {
+              const games = player.matches.wins + player.matches.losses
+              const winRate = player.matches.wins / games
+              console.log(`Player ${player.name} has a win rate of ${winRate * 100}`)
+              resolve()
+          }, 200)
+      })
+  }
+
+  function lostMatch(player) {
+      return new Promise(resolve => {
+          setTimeout(() => {
+              console.log('Player has lost a match')
+              player.matches.losses += 1
+              resolve()
+          }, 100)
+      })
+  }
+
+  winRate(proPlayer)
+      .then(() => Promise.all([
+          winRate(proPlayer),
+          lostMatch(proPlayer),
+      ]))
+#+end_src
+
+**** Com imutabilidade
+
+#+begin_src js :tangle examples/3.3-immutability--immutable.js
+  const proPlayer = {
+      name: 'Flash',
+      game: 'Starcraft: Brood War',
+      race: 'Terran',
+      matches: { wins: 779, losses: 297 }
+  }
+
+  function winRate(player) {
+      return new Promise(resolve => {
+          setTimeout(() => {
+              const games = player.matches.wins + player.matches.losses
+              const winRate = player.matches.wins / games
+              console.log(`Player ${player.name} has a win rate of ${winRate * 100}`)
+              resolve()
+          }, 200)
+      })
+  }
+
+  function lostMatch(player) {
+      return new Promise(resolve => {
+          setTimeout(() => {
+              console.log('Player has lost a match')
+              const newData = {
+                  ...player,
+                  matches: { ...player.matches, losses: player.matches.losses + 1 }
+              }
+              resolve(newData)
+          }, 100)
+      })
+  }
+
+  winRate(proPlayer)
+      .then(() => Promise.all([
+          winRate(proPlayer),
+          lostMatch(proPlayer),
+      ]))
+#+end_src
+
+** Avaliação preguiçosa (/Lazy evaluation/)
+
+- Mecanismo que "atrasa" a avaliação de uma expressão até que o seu valor (output) seja necessário
+- Com isso, linguagens funcionais conseguem criar listas infinitas, onde em linguagens imperativas seria impossível
+  
+*** Exemplo
+
+#+begin_src js :tangle examples/3.4-lazy-evaluation.js
+  const rand = function * () {
+      while (true) {
+          yield Math.random()
+      }
+  }
+
+  const randIter = rand()
+  console.log(randIter.next())
+  console.log(randIter.next())
+  console.log(randIter.next())
+#+end_src
+
+** Recursão
+
+Ver a apresentação do Sérgio
+
+- Linguagues funcionais não possuem laços de repetição :: =for=, =while=, =do while=
+- Eles utilizam recursão
+- Por isso o /garbage collector/ dessas linguaguens é totalmente diferente do JS e por isso é importate a avaliação preguiçosa
+
+*** Exemplo
+
+#+begin_src js :tangle examples/3.5-recursion.js
+  function factorial(number) {
+      if (number === 0) return 1
+      return number * factorial(number - 1)
+  }
+
+  console.log(factorial(3))
+#+end_src
+
+** Funções Puras
+
+- Funções não devem ter nenhuma referência fora de seu escopo
+- Funções devem ter a mesma saída de dado (/output/) quando recebem o mesmo dado de entrada (/input/)
+
+*** Exemplos
+
+**** Impuro
+
+#+NAME: black-country
+#+begin_src js
+  const newBand = {
+      name: 'Black Country, New Road',
+      members: ['Tyler', 'Lewis', 'Georgia', 'May', 'Charlie', 'Luke', 'Isaac'],
+      albums: ['Ants from Up There']
+  }
+#+end_src
+
+#+begin_src js :noweb yes :tangle examples/3.6-pure-function--impure.js
+  <<black-country>>
+
+  function releaseRecord(recordName) {
+      newBand.albums.push(recordName)
+  }
+
+  function removeMember(memberName) {
+      const index = newBand.members.indexOf(memberName)
+      newBand.members.splice(index, 1)
+  }
+
+  removeMember('Isaac')
+
+  console.log(newBand)
+
+  releaseRecord('Live at Bush Hall')
+
+  console.log(newBand)
+#+end_src
+
+**** Puro
+
+#+begin_src js :noweb yes :tangle examples/3.6-pure-function--pure.js
+  <<black-country>>
+
+  const releaseRecord = (band, recordName) => ({
+      ...band,
+      albums: [...band.albums, recordName]
+  })
+
+  const removeMember = (band, memberName) => ({
+      ...band,
+      members: band.members.filter(member => member !== memberName)
+  })
+
+  const bandWithoutIsaac = removeMember(newBand, 'Isaac')
+
+  console.log(bandWithoutIsaac)
+
+  const bandWithANewRecord = releaseRecord(bandWithoutIsaac, 'Live at Bush Hall')
+
+  console.log(newBand)
+  console.log(bandWithANewRecord)
+#+end_src
+
+** Funções de alta ordem (/High-order functions/)
+
+Ver a apresentação do Vandre sobre /closures/
+
+- Funções que retornam uma função para ser executada mais tarde
+
+*** Exemplo
+#+NAME: best-band-example
+#+begin_src js
+  const kingGizzard = {
+      name: 'King Gizzard and the Lizard Wizard',
+      genres: [
+          'garage rock',
+          'rock',
+          'psychedelic rock',
+          'jazz fusion',
+          'heavy psychedelic rock',
+          'progressive rock',
+          'syth pop',
+          'thrash metal'
+      ]
+  }
+#+end_src
+
+#+begin_src js :noweb yes :tangle examples/3.7-high-order-functions.js
+  <<best-band-example>>
+  function validateBandGenre(band) {
+      return function(genre) {
+          return band.genres.includes(genre)
+      }
+  }
+
+  // or using arrow function ===> const validateBandGenre = band => genre => band.genres.includes(genre)
+
+  const validateKingGizzardGenres = validateBandGenre(kingGizzard)
+
+  console.log(
+      validateKingGizzardGenres('rock')
+  )
+  console.log(
+      validateKingGizzardGenres('pop')
+  )
+#+end_src
+
+* Composição de funções
+
+- Funções que são compostas por outras funções para criar um novo comportamento/função
+- Tem várias bibliotecas utilitárias no JS:
+  - [[https://github.com/lodash/lodash/wiki/FP-Guide][Módulo PF do Lodash]] :: não possui muitos utilitários
+  - [[https://ramdajs.com/][Ramda JS]] :: possui muitos utilitários e muito mais focado em programação funcional
+
+** Pipe
+
+- Sequencia funções para serem executadas em ordem
+- A saída de uma função vai ser a entrada da próxima função até todas as funções serem executadas
+- Funções de alto nível que retorna uma função, onde o parâmetro inicial é o da primeira função e a saída vai ser da última função
+
+#+NAME: pipe-example
+#+begin_src js
+  function pipe(...fns) {
+      return function(value) {
+          return fns.reduce((acc, fn) => fn(acc), value)
+      }
+  }
+#+end_src
+  
+*** Exemplos
+
+**** Sem pipe
+
+#+begin_src js :noweb yes :tangle examples/4.1-function-composition--pipe--without-pipe.js
+  <<black-country>>
+
+  const releaseRecord = recordName => band => ({
+      ...band,
+      albums: [...band.albums, recordName]
+  })
+
+  const removeMember = memberName => band => ({
+      ...band,
+      members: band.members.filter(member => member !== memberName)
+  })
+
+  const bandWithoutIsaac = removeMember('Isaac')(newBand)
+
+  console.log(bandWithoutIsaac)
+
+  const bandWithANewRecord = releaseRecord('Live at Bush Hall')(bandWithoutIsaac)
+
+  console.log(newBand)
+  console.log(bandWithANewRecord)
+#+end_src
+
+**** Com pipe
+
+  #+begin_src js :noweb yes :tangle examples/4.1-function-composition--pipe--with-pipe.js
+    <<pipe-example>>
+    <<black-country>>
+
+    const releaseRecord = recordName => band => ({
+        ...band,
+        albums: [...band.albums, recordName]
+    })
+
+    const removeMember = memberName => band => ({
+        ...band,
+        members: band.members.filter(member => member !== memberName)
+    })
+
+    const finalLineup = pipe(removeMember('Isaac'), releaseRecord('Live at Bush Hall'))
+
+    console.log(
+        finalLineup(newBand)
+    )
+  #+end_src
+
+** Compose
+
+- O mesmo que =pipe=, mas a ordem de execução é da direita pra esquerda
+
+#+begin_src js :noweb yes :tangle examples/4.2-function-composition--compose.js
+  <<pipe-example>>
+  <<black-country>>
+
+  function compose(...fns) {
+      return pipe(...fns.reverse())
+  }
+
+  const releaseRecord = recordName => band => ({
+      ...band,
+      albums: [...band.albums, recordName]
+  })
+
+  const removeMember = memberName => band => ({
+      ...band,
+      members: band.members.filter(member => member !== memberName)
+  })
+
+  const finalLineup = compose(releaseRecord('Live at Bush Hall'), removeMember('Isaac'))
+
+
+  console.log(
+      finalLineup(newBand)
+  )
+#+end_src
+
+** Curry
+
+- Faz com que seja possível chamar a funcão sem passar todos os parâmetros, mas não a executa
+- Só é executada quando receber todos os parâmetros
+
+  #+NAME: curry-example
+  #+begin_src js
+    function curry(fn, arity) {
+        arity ||= fn.length
+
+        return function(...args) {
+            if (args.length < arity) {
+                return curry(
+                    (...lefts) => fn(...args, ...lefts),
+                    arity - args.length
+                )
+            }
+
+            return fn(...args)
+        }
+    }
+  #+end_src
+  
+*** Exemplos
+
+**** Sem curry
+
+#+begin_src js :noweb yes :tangle examples/4.3-function-composition--curry--without-curry.js
+  <<best-band-example>>
+
+  function validateBand(band, field, data) {
+      if (field === 'name') {
+          return band.name === data
+      }
+
+      if (field === 'genres') {
+          return band.genres.includes(data)
+      }
+  }
+
+  console.log(
+      validateBand(kingGizzard, 'genres', 'rock')
+  )
+  console.log(
+      validateBand(kingGizzard, 'genres', 'psychedelic rock')
+  )
+#+end_src
+
+**** Com curry
+
+#+begin_src js :noweb yes :tangle examples/4.3-function-composition--curry--with-curry.js
+  <<best-band-example>>
+  <<curry-example>>
+
+  function validateBand(band, field, data) {
+      if (field === 'name') {
+          return band.name === data
+      }
+
+      if (field === 'genres') {
+          return band.genres.includes(data)
+      }
+  }
+
+  const curriedValidateBand = curry(validateBand)
+
+  const validateKingGizzardGenres = curriedValidateBand(kingGizzard, 'genres')
+
+  console.log(
+      validateKingGizzardGenres('rock')
+  )
+  console.log(
+      validateKingGizzardGenres('psychedelic rock')
+  )
+#+end_src
+
+* Pontos negativos
+
+** Consumo de memória
+
+** A tipagem do sistema pode ser tornar complexa com o tempo
+
+** Difícil de introduzir
+
+* Referências
+
+- [[https://www.youtube.com/watch?v=e-5obm1G_FY][Learning Functional Programming with Javascript - Anjana Vakil]]
+  
+- [[https://github.com/raonifn/ramda-presentation][Ramda presentation - Raoni Normanton]]
+
+- [[https://github.com/hemanth/functional-programming-jargon][Functional Programming Jargons]]
