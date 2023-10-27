@@ -1,0 +1,7 @@
+* Functional Programming presentation
+
+This is a talk I made where I work to show a little bit of functional programming in JS.
+
+You can see a version in [[file:presentation.org][english]] and in [[file:presentation-BR.org][portuguese]].
+
+All the examples used in the presentation can be seen complete in the [[file:examples/][examples]] directory
